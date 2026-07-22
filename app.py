@@ -196,21 +196,14 @@ st.markdown(
 # 1. Load trained model and artifacts
 @st.cache_resource
 def load_resources():
-    try:
-        model = tf.keras.models.load_model(
-            "model.h5",
-            compile=False
-        )
+    model = tf.keras.models.load_model(
+        "model.h5",
+        compile=False
+    )
+    scaler = joblib.load("scaler.pkl")
+    ohe = joblib.load("onehotencoder.pkl")
 
-        scaler = joblib.load("scaler.pkl")
-        ohe = joblib.load("onehotencoder.pkl")
-
-        return model, scaler, ohe
-
-    except Exception as e:
-        st.error("Failed to load AI model resources.")
-        st.exception(e)
-        st.stop()
+    return model, scaler, ohe
     
 
 model, scaler, ohe = load_resources()
