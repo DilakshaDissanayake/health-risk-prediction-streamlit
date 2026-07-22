@@ -196,10 +196,22 @@ st.markdown(
 # 1. Load trained model and artifacts
 @st.cache_resource
 def load_resources():
-    model = tf.keras.models.load_model('model.h5')
-    scaler = joblib.load('scaler.pkl')
-    ohe = joblib.load('onehotencoder.pkl')
-    return model, scaler, ohe
+    try:
+        model = tf.keras.models.load_model(
+            "model.h5",
+            compile=False
+        )
+
+        scaler = joblib.load("scaler.pkl")
+        ohe = joblib.load("onehotencoder.pkl")
+
+        return model, scaler, ohe
+
+    except Exception as e:
+        st.error("Failed to load AI model resources.")
+        st.exception(e)
+        st.stop()
+    
 
 model, scaler, ohe = load_resources()
 
@@ -257,7 +269,6 @@ with st.form("prediction_form"):
 
 # 3. Prediction Logic
 if submit_button:
-    # Feature 8ක්ම එකම පිළිවෙලට DataFrame එකට දාන්න
     input_data = pd.DataFrame({
         'bmi': [bmi],
         'sleep_duration': [sleep_duration],
@@ -281,7 +292,6 @@ if submit_button:
     ]))
     cat_cols = list(getattr(ohe, 'feature_names_in_', ['stress_level']))
     
-    # Scaling සහ Encoding
     num_scaled = scaler.transform(input_data[num_cols])
     cat_encoded = ohe.transform(input_data[cat_cols])
     
